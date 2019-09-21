@@ -1,9 +1,5 @@
 /*
     TODO:
-    1) Change description
-    2) Error analysis
-    3) 3D plot
-    4) Change X axis label from `iteration` to `time (ev^-1)`
 
     PROGRAM WRITTEN BY ANIOL SALA (github.com/AniolSala)
 
@@ -19,7 +15,7 @@
     Note that for the stability of the solutions, the relation
     between dx and dt must be:
 
-    dx² / dt >= ...
+    dx² / dt <= 2 / m
 
     where dt and dx are the time and space intervals.
 
@@ -47,28 +43,53 @@ const double h_bar = 4.135667731e-15; // eV·s
 const double c = 299792458;           // m/s
 
 // Physical constans used in the calc:
-const double m = 1;      // eV
+const double m = 1.;     // eV
 const double L = 1.;     // eV^-1 (NU)
-const double tmax = .02; // eV^-1 (nu)
+const double tmax = .01; // eV^-1 (nu)
 
 int main() {
+    // Name of the output file
+    char *outputFileName = "../data/schrEq1D_gaussian_wpacketpot_low_alt.txt";
 
+    // Space / time intervals and space / time steps
     double dx, dt;
     unsigned int nx, nt;
+
+    // Params of the potential wall:
+    // V: Potential, can be 0 or V0.
+    // V0: Value of the potential wall.
+    // x0: Position of the barrier
+    // d: Width of the barrier
+    // E: Energy of the particle
+    // T: Transmission coefficient
+    // j0: First index of the grid containing the barrier
+    // dj: Interval of the grid corresponding to the width of the barrier
+    double V, V0, x0, d, E, T;
+    unsigned j0, dj;
+
+    // Params of initial conditions
+    double sigma = L / 30., mu = -L / 3.5; // Gaussian
+    double k0 = 100;
+
+    // Define space interval dx and the number of nodes in the grid nx
     dx = 0.001;
-    // dt = (double)1 / ((double)2 / (m * dx * dx) + L * L / (double)4);
-    dt = m * dx * dx / (double)2;
     nx = L / dx + 1;
+
+    // Parameters of the potential wall
+    j0 = nx / 2;
+    dj = (1. * L / 20.) / dx;
+    x0 = -L / 2. + dx * j0;
+    d = dx * dj;
+    E = k0 * k0 / (2. * m) + 1. / (8. * m * sigma * sigma);
+    V0 = E * 1.05; // .3
+    T = exp(-2. * (double)dj * dx * sqrt(2. * m * (V0 - E)));
+
+    // Define the time interval dt and the number of time steps nt
+    dt = (double)1 / ((double)2 / (m * dx * dx) + V0 * .5);
+    // dt = m * dx * dx / (double)2;  // If there is no potential
     nt = tmax / dt + 1;
 
-    printf("\n----------PARAMS----------------------------\n");
-    printf("L = %lf, tmax = %lf\n", L, tmax);
-    printf("dx = %lf, dt = %1.10lf, dv = %lf\n", dx, dt, dx / dt);
-    printf("nx = %u, nt = %u\n", nx, nt);
-    printf("dx² / dt = %lf, h / 2m = %lf\n", dx * dx / dt, 2 / m);
-    printf("--------------------------------------------\n\n");
-
-    // TODO: phi description
+    // Allocate memory for the solution
     cnum *phi0 = malloc(nx * sizeof(cnum)), *phi1 = malloc(nx * sizeof(cnum)),
          *phi2 = malloc(nx * sizeof(cnum));
     if (!phi0 || !phi1 || !phi2) {
@@ -84,38 +105,38 @@ int main() {
     phi1[nx - 1] = 0 + 0 * I;
     phi2[nx - 1] = 0 + 0 * I;
 
-    // Parameters of the initial shape
-    double sigma = L / 30., mu = -L / 3.5;
-    double k0 = m * 20.;
+    // Print all params used
+    printf("\n----------PARAMS----------------------------\n");
+    printf("L = %lf, tmax = %lf\n", L, tmax);
+    printf("dx = %lf, dt = %1.10lf, dv = %lf\n", dx, dt, dx / dt);
+    printf("nx = %u, nt = %u\n", nx, nt);
+    printf("dx² / dt = %lf, h / 2m = %lf\n", dx * dx / dt, 2 / m);
+    printf("V0 = %lf, E = %lf\n", V0, E);
+    printf("Potential wall:\n");
+    printf("x0 = %lf, d = %lf, j0 = %u, dj = %u, dx = %lf, T = %lf\n", x0, d,
+           3 * nx / 4, dj, (double)dj * dx, T);
+    printf("--------------------------------------------\n\n");
 
-    // For quantum tunneling
-    double V0 = k0 * k0 / (2. * m) + 1.; // Value of the potential wall
-    unsigned dj = (10. * L / 100.) / dx; // (index) width of potential wall
-
-    double T =
-        exp(-2. * (double)dj * dj * sqrt(2. * m * (V0 - k0 * k0 / (2. * m))));
-    printf("dj = %u, dx = %lf, T = %lf\n", dj, (double)dj * dj, T);
-
-    // Initial conditions: gaussian centered at the origin
-    // The leapfrog method requires to define phi0 and also phi1
+    // Initial conditions: (The leapfrog method requires to define phi0 and also phi1)
     for (unsigned j = 0; j < nx; j++) {
-        double x = -L / 2 + j * dx;
+        double x = -L / 2. + (double)j * dx;
         // weights: .5, .3, .2
         phi0[j] =
             sqrt(gaussian(x, sigma, mu)) * (cos(k0 * x) + I * sin(k0 * x));
     }
     for (unsigned j = 1; j < nx - 1; j++) {
         // double x = -L / 2 + j * dx;
-        double pot = 0;
-        if (j >= 3 * nx / 4 && j <= 3 * nx / 4 + dj) {
-            pot = V0;
+        if (j >= j0 && j <= j0 + dj) {
+            V = V0;
+        } else {
+            V = 0.;
         }
         phi1[j] = phi0[j] + (double)0.5 * slopeLF(dt, dx, phi0, j, m) -
-                  2. * dt * I * phi0[j] * pot;
+                  2. * dt * I * phi0[j] * V; // Wall
     }
 
     // File to save the solution
-    FILE *output1 = fopen("../data/schrEq1D_gaussian_wpacketpot.txt", "w");
+    FILE *output1 = fopen(outputFileName, "w");
     if (!output1) {
         printf("Error: Couldn't open file\n");
         exit(1);
@@ -141,14 +162,16 @@ int main() {
         // Next value of phi
         for (unsigned j = 1; j < nx - 1; j++) {
             // double x = -L / 2 + j * dx;
-            double pot = 0;
-            if (j >= 3 * nx / 4 && j <= 3 * nx / 4 + dj) {
-                pot = V0;
+            if (j >= j0 && j <= j0 + dj) {
+                V = V0;
             } else {
-                phi2[j] = phi0[j] + slopeLF(dt, dx, phi1, j, m) -
-                          2. * I * dt * phi0[j] * pot;
+                V = 0.;
             }
+            phi2[j] = phi0[j] + slopeLF(dt, dx, phi1, j, m) -
+                      2. * dt * I * phi1[j] * V; // Wall
+            // dt * I * phi1[j] * x * x; //  Harmonic oscillator
         }
+
         // Update values
         for (unsigned j = 0; j < nx; j++) {
             phi0[j] = phi1[j];
@@ -157,10 +180,11 @@ int main() {
         // Write the solution to the file
         if (i % (nt / nPlots) == 0) {
             for (unsigned j = 0; j < nx; j++) {
-                writeSol(output1, phi2, i, j, dt, dx, 0, -L / 2);
+                writeSol(output1, phi2, i, j, dt, dx, 0, -L / 2.);
             }
         }
     }
+
     printf("Done\n\n");
 
     // Release memory

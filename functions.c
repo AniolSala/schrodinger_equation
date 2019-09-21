@@ -19,23 +19,6 @@ double gaussian(double x, double sigma, double mu) {
     return factor * exp(-(x - mu) * (x - mu) / ((double)2 * sigma * sigma));
 }
 
-cnum nextStep(double dx, cnum *phi, cnum val, unsigned ind, double m) {
-    cnum s = I / ((double)2 * m * dx * dx);
-    return s * (phi[ind + 1] - (double)2 * val + phi[ind - 1]);
-}
-
-cnum slopeRK4(double dt, double dx, cnum *phi, unsigned ind, double m) {
-    // Compute the slope (phinew - phiold) for a given x_ind = ind * dx
-    cnum k1, k2, k3, k4;
-
-    k1 = nextStep(dx, phi, phi[ind], ind, m);
-    k2 = nextStep(dx, phi, phi[ind] + dt * (double).5 * k1, ind, m);
-    k3 = nextStep(dx, phi, phi[ind] + dt * (double).5 * k2, ind, m);
-    k4 = nextStep(dx, phi, phi[ind] + dt * k3, ind, m);
-
-    return dt * (k1 + (double)2 * k2 + (double)2 * k3 + k4) / (double)6;
-}
-
 cnum slopeLF(double dt, double dx, cnum *phi, unsigned ind, double m) {
     cnum s = I * dt / (m * dx * dx);
     return s * (phi[ind + 1] - (double)2 * phi[ind] + phi[ind - 1]);

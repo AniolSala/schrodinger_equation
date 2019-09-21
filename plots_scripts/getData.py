@@ -7,20 +7,20 @@ import os
 
 class DataParser:
     """
-    Class thought to manipulated data int the format:
+    Class thought to manipulate data with a csv type-like:
 
     #time-value  #space-value    #sol-1      #sol-2     #etc
-      t0            x0            y00          z00
-      t0            x1            y01          z11
+      t0            x0            y0,0          z0,0
+      t0            x1            y0,1          z1,1
       ...           ...           ...          ...
-      t0            xN-1          y0N-1        z0N-1
-      t1            x0            y10          z10
-      t1            x1            y11          z11
-      t1            x2            y12          z12
+      t0            xN-1          y0,N-1        z0,N-1
+      t1            x0            y1,0          z1,0
+      t1            x1            y1,1          z1,1
+      t1            x2            y1,2          z1,2
       ...           ...           ...          ...
-      t1            xN-1          y1N-1        zN-1
+      t1            xN-1          y1,N-1        z1,N-1
 
-    where y and z are some solutions for a given time (it can be
+    where y and z are some solutions for a given time (there can be
     an arbitrary number of solutions).
 
     Each subgroup of the solutions corresponding to the same time value

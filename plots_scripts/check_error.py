@@ -41,7 +41,7 @@ def main():
     error = 1. - area
 
     axerr.plot(iters, error)
-    axerr.set_xlabel("Iteration")
+    axerr.set_xlabel("time")
     axerr.set_ylabel("error")
 
     plt.show()

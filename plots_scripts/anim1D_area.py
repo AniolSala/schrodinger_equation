@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 #
-# Script to make an animated subplot of the solution and its area / error
+# Script to make an animated subplot of the solution and its area / areaor
 #
 
 
@@ -21,7 +21,7 @@ def getError(plotsList):
 
 
 # Files to plot
-filename = "schrEq1D_gaussian_wpacketpot.txt"
+filename = "schrEq1D_gaussian_wpacketpot_low_alt.txt"
 outputName = os.path.splitext(filename)[0] + "_area.gif"
 modes = [char for char in filename.split(
     "_") if char.isdigit()]  # Take the modes we want to plot from the filename
@@ -42,9 +42,9 @@ fig, plots = plt.subplots(
     gridspec_kw={'hspace': 0}
 )
 
-axs, err = plots[0], plots[1]
+axs, area = plots[0], plots[1]
 
-# Solution plot
+# Solution plot (real part)
 phiReal, = axs.plot(
     frames[0][1, :],        # x data
     frames[0][2, :],        # y data
@@ -52,6 +52,7 @@ phiReal, = axs.plot(
     label=r'real($\psi$)'   # legend
 )
 
+# Solution plot (imaginary part)
 phiImag, = axs.plot(
     frames[0][1, :],        # x data
     frames[0][3, :],        # y data
@@ -60,6 +61,7 @@ phiImag, = axs.plot(
     label=r'imag($\psi$)'   # legend
 )
 
+# Set axis properties
 x0 = round(max(data[1, :]) * 1.1, 2)
 axs.set(
     xlabel=r'$x (eV^{-1})$',
@@ -70,33 +72,38 @@ axs.set(
 
 
 # Error / area plot
-# areaList = getError(frames)  # Square of the area
 yErrLabel = r'$\int\vert\psi\vert^2\,dx$'
 xErrLabel = r'time $eV^{-1}$'
 yAreaLabel = r'$\vert\psi\vert^2$'
 xAreaLabel = r'x $(eV^{-1})$'
 
 
-pl2, = err.plot(frames[0][1, :],
-                frames[0][4, :],
-                "r-",
-                rasterized=True)
+pl2, = area.plot(frames[0][1, :],
+                 frames[0][4, :],
+                 "r-",
+                 rasterized=True)
 
 # Plot also psi² for the desired modes
 for i in modes:
     modePhi2 = DataParser(
         "schrEq1D_normmode_{}_box.txt".format(i)).getPlotsList()[0]
-    err.plot(modePhi2[1, :],
-             modePhi2[4, :],
-             '--',
-             label=r'$\vert \psi \vert^2$ for mode n = ' + '{}'.format(i))
+    area.plot(modePhi2[1, :],
+              modePhi2[4, :],
+              '--',
+              label=r'$\vert \psi \vert^2$ for mode n = ' + '{}'.format(i))
+
+# Plot also the potential barrier
+xb, d, heigh = 0., .05, max(data[4, :] * 0.3)
+xBarrier = [xb, xb, xb + d, xb + d]
+yBarrier = [0, heigh, heigh, 0]
+area.plot(xBarrier, yBarrier, "--", color="black")
 
 for plot in plots:
     plot.label_outer()
 
 x0 = round(max(data[1, :]) * 1.1, 1)
 y0 = round(max(data[4, :]) * 1.1, 1)
-err.set(
+area.set(
     xlabel=xAreaLabel,
     ylabel=yAreaLabel,
     xlim=(-x0, x0),
@@ -104,7 +111,7 @@ err.set(
 )
 
 axs.legend(loc='upper right')
-err.legend(loc='upper right')
+area.legend(loc='upper right')
 
 print("Plot settings done")
 
@@ -118,12 +125,8 @@ def update(frame):
     return phiReal, phiImag, pl2,
 
 
-nFrames = int(len(frames) / 1.0)
+nFrames = int(len(frames) * .7)
 output = os.path.join(dataPars.getDataDir(), "plots", "areas")
 outputName = os.path.join(output, outputName)
-animation = FuncAnimation(
-    fig, update, frames=range(1, nFrames, 1), blit=True)
-animation.save(outputName, writer="imagemagick",
-               fps=40, dpi=25, metadata=None)
-
-# plt.show()
+animation = FuncAnimation(fig, update, frames=range(1, nFrames, 5), blit=True)
+animation.save(outputName, writer="imagemagick", fps=40, dpi=50, metadata=None)

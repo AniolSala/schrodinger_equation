@@ -81,5 +81,10 @@ def update(frame):
 output = os.path.join(dataPars[0].getDataDir(), "plots", "normmodes")
 outputName = os.path.join(output, outputName)
 animation = FuncAnimation(
-    fig, update, frames=range(1, len(nFrames[0]) // 4, 1), interval=400, blit=True)
-animation.save(outputName, writer="imagemagick", fps=50, dpi=40)
+    fig,
+    update,
+    frames=range(1, len(nFrames[0]) // 10, 1),
+    # interval=400,
+    blit=True
+)
+animation.save(outputName, writer="imagemagick", fps=30, dpi=40)
