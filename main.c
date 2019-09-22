@@ -27,7 +27,7 @@
     computes one step of the leapfrog algorithm with a potential
     equal to 0. To add a potential:
 
-        phi2[j] = phi0[j] + slopeLF(i, j) - 2 * dt * I * V[i, j]
+        psi2[j] = psi0[j] + slopeLF(i, j) - 2 * dt * I * V[i, j]
 
 */
 
@@ -49,7 +49,7 @@ const double tmax = .01; // eV^-1 (nu)
 
 int main() {
     // Name of the output file
-    char *outputFileName = "../data/schrEq1D_gaussian_wpacketpot_low_alt.txt";
+    char *outputFileName = "../data/schrEq1D_gaussian_wpacketpot_high.txt";
 
     // Space / time intervals and space / time steps
     double dx, dt;
@@ -81,29 +81,29 @@ int main() {
     x0 = -L / 2. + dx * j0;
     d = dx * dj;
     E = k0 * k0 / (2. * m) + 1. / (8. * m * sigma * sigma);
-    V0 = E * 1.05; // .3
+    V0 = E * 1.05; // 1.05; // .3
     T = exp(-2. * (double)dj * dx * sqrt(2. * m * (V0 - E)));
 
     // Define the time interval dt and the number of time steps nt
-    dt = (double)1 / ((double)2 / (m * dx * dx) + V0 * .5);
+    dt = (double)1 / ((double)2 / (m * dx * dx) + V0);
     // dt = m * dx * dx / (double)2;  // If there is no potential
     nt = tmax / dt + 1;
 
     // Allocate memory for the solution
-    cnum *phi0 = malloc(nx * sizeof(cnum)), *phi1 = malloc(nx * sizeof(cnum)),
-         *phi2 = malloc(nx * sizeof(cnum));
-    if (!phi0 || !phi1 || !phi2) {
-        printf("Error: Malloc phi\n");
+    cnum *psi0 = malloc(nx * sizeof(cnum)), *psi1 = malloc(nx * sizeof(cnum)),
+         *psi2 = malloc(nx * sizeof(cnum));
+    if (!psi0 || !psi1 || !psi2) {
+        printf("Error: Malloc psi\n");
         exit(1);
     }
 
-    // Boundary conditions: phi(t, 0) = phi(t, L) = 0
-    phi0[0] = 0 + 0 * I;
-    phi1[0] = 0 + 0 * I;
-    phi2[0] = 0 + 0 * I;
-    phi0[nx - 1] = 0 + 0 * I;
-    phi1[nx - 1] = 0 + 0 * I;
-    phi2[nx - 1] = 0 + 0 * I;
+    // Boundary conditions: psi(t, 0) = psi(t, L) = 0
+    psi0[0] = 0 + 0 * I;
+    psi1[0] = 0 + 0 * I;
+    psi2[0] = 0 + 0 * I;
+    psi0[nx - 1] = 0 + 0 * I;
+    psi1[nx - 1] = 0 + 0 * I;
+    psi2[nx - 1] = 0 + 0 * I;
 
     // Print all params used
     printf("\n----------PARAMS----------------------------\n");
@@ -117,11 +117,10 @@ int main() {
            3 * nx / 4, dj, (double)dj * dx, T);
     printf("--------------------------------------------\n\n");
 
-    // Initial conditions: (The leapfrog method requires to define phi0 and also phi1)
+    // Initial conditions: (The leapfrog method requires to define psi0 and also psi1)
     for (unsigned j = 0; j < nx; j++) {
         double x = -L / 2. + (double)j * dx;
-        // weights: .5, .3, .2
-        phi0[j] =
+        psi0[j] =
             sqrt(gaussian(x, sigma, mu)) * (cos(k0 * x) + I * sin(k0 * x));
     }
     for (unsigned j = 1; j < nx - 1; j++) {
@@ -131,8 +130,8 @@ int main() {
         } else {
             V = 0.;
         }
-        phi1[j] = phi0[j] + (double)0.5 * slopeLF(dt, dx, phi0, j, m) -
-                  2. * dt * I * phi0[j] * V; // Wall
+        psi1[j] = psi0[j] + (double)0.5 * slopeLF(dt, dx, psi0, j, m) -
+                  2. * dt * I * psi0[j] * V; // Wall
     }
 
     // File to save the solution
@@ -145,10 +144,10 @@ int main() {
     // Write initial conditions
     printf("Writing initial conditions...\n");
     for (unsigned j = 0; j < nx; j++) {
-        writeSol(output1, phi0, 0, j, dt, dx, 0, -L / 2);
+        writeSol(output1, psi0, 0, j, dt, dx, 0, -L / 2);
     }
     for (unsigned j = 0; j < nx; j++) {
-        writeSol(output1, phi1, 1, j, dx, dt, 0, -L / 2);
+        writeSol(output1, psi1, 1, j, dx, dt, 0, -L / 2);
     }
     printf("Done\n\n");
 
@@ -159,7 +158,7 @@ int main() {
         printf("Error: Invalid number (%u) of nPlots\n", nt / nPlots);
     }
     for (unsigned i = 2; i < nt - 1; i++) {
-        // Next value of phi
+        // Next value of psi
         for (unsigned j = 1; j < nx - 1; j++) {
             // double x = -L / 2 + j * dx;
             if (j >= j0 && j <= j0 + dj) {
@@ -167,20 +166,20 @@ int main() {
             } else {
                 V = 0.;
             }
-            phi2[j] = phi0[j] + slopeLF(dt, dx, phi1, j, m) -
-                      2. * dt * I * phi1[j] * V; // Wall
-            // dt * I * phi1[j] * x * x; //  Harmonic oscillator
+            psi2[j] = psi0[j] + slopeLF(dt, dx, psi1, j, m) -
+                      2. * dt * I * psi1[j] * V; // Wall
+            // dt * I * psi1[j] * x * x; //  Harmonic oscillator
         }
 
         // Update values
         for (unsigned j = 0; j < nx; j++) {
-            phi0[j] = phi1[j];
-            phi1[j] = phi2[j];
+            psi0[j] = psi1[j];
+            psi1[j] = psi2[j];
         }
         // Write the solution to the file
         if (i % (nt / nPlots) == 0) {
             for (unsigned j = 0; j < nx; j++) {
-                writeSol(output1, phi2, i, j, dt, dx, 0, -L / 2.);
+                writeSol(output1, psi2, i, j, dt, dx, 0, -L / 2.);
             }
         }
     }
@@ -190,12 +189,12 @@ int main() {
     // Release memory
     printf("Releasing memory...\n");
     fclose(output1);
-    free(phi0);
-    free(phi1);
-    free(phi2);
-    phi0 = NULL;
-    phi1 = NULL;
-    phi2 = NULL;
+    free(psi0);
+    free(psi1);
+    free(psi2);
+    psi0 = NULL;
+    psi1 = NULL;
+    psi2 = NULL;
     printf("Done\n\n");
     printf("Program terminated with exit\n\n");
 }

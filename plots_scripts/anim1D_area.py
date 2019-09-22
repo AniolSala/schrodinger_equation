@@ -1,7 +1,15 @@
 #!/usr/bin/env python3
 
 #
-# Script to make an animated subplot of the solution and its area / areaor
+# Script to make an animated subplot of the solution and its area
+#
+# It is a mess, but main idea is to define two subplots. In the
+# first subplot we will plot the real and complex part of the
+# solution.
+# In the second subplot we will plot the squared module of the
+# solution. If the solution is a mixed state (built from various
+# states), then in this subplot show also the squared module of
+# these states. These states are got in the `modes` list.
 #
 
 
@@ -21,7 +29,7 @@ def getError(plotsList):
 
 
 # Files to plot
-filename = "schrEq1D_gaussian_wpacketpot_low_alt.txt"
+filename = "schrEq1D_gaussian_wpacketpot_high.txt"
 outputName = os.path.splitext(filename)[0] + "_area.gif"
 modes = [char for char in filename.split(
     "_") if char.isdigit()]  # Take the modes we want to plot from the filename
@@ -93,7 +101,7 @@ for i in modes:
               label=r'$\vert \psi \vert^2$ for mode n = ' + '{}'.format(i))
 
 # Plot also the potential barrier
-xb, d, heigh = 0., .05, max(data[4, :] * 0.3)
+xb, d, heigh = 0., .05, max(data[4, :] * 1.05)  # 1.05 / 0.3
 xBarrier = [xb, xb, xb + d, xb + d]
 yBarrier = [0, heigh, heigh, 0]
 area.plot(xBarrier, yBarrier, "--", color="black")
@@ -101,7 +109,7 @@ area.plot(xBarrier, yBarrier, "--", color="black")
 for plot in plots:
     plot.label_outer()
 
-x0 = round(max(data[1, :]) * 1.1, 1)
+x0 = .5  # round(max(data[1, :]) * 1.1, 1)
 y0 = round(max(data[4, :]) * 1.1, 1)
 area.set(
     xlabel=xAreaLabel,
@@ -125,8 +133,8 @@ def update(frame):
     return phiReal, phiImag, pl2,
 
 
-nFrames = int(len(frames) * .7)
+nFrames = int(len(frames) * .6)
 output = os.path.join(dataPars.getDataDir(), "plots", "areas")
 outputName = os.path.join(output, outputName)
 animation = FuncAnimation(fig, update, frames=range(1, nFrames, 5), blit=True)
-animation.save(outputName, writer="imagemagick", fps=40, dpi=50, metadata=None)
+animation.save(outputName, writer="imagemagick", fps=40, dpi=25, metadata=None)

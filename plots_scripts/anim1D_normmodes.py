@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
 
+#
+# Script that plots four different subplots corresponding
+# to four normal modes of the solution of the Schrödinger
+# equation.
+#
+
 import os
 import seaborn as sns
 import matplotlib.pyplot as plt
@@ -10,9 +16,9 @@ plt.rcParams.update({'font.size': 18})
 
 # Plot the first four modeReals
 nPlots = 4
-filenames = ["schrEq1D_normmode_{}_box.txt".format(i + 1)
+filenames = ["schrEq1D_normmode_{}_ho.txt".format(i + 0)
              for i in range(nPlots)]
-outputName = "schrEq1D_normmodes_box.gif"
+outputName = "schrEq1D_normmodes_ho.gif"
 dataPars = [DataParser(filename) for filename in filenames]
 nFrames = [dataP.getPlotsList() for dataP in dataPars]
 # nFrames[modeReal][frame] = (nrows, ncols) ndarray
@@ -56,8 +62,8 @@ axs[1, 1].legend(loc='upper right')
 # x-y labels
 for i, ax in enumerate(axs.flat):
     ax.set(xlabel=r'$x (eV^{-1})$',
-           title=r'modeReal $n_x$ = {}'.format(i + 1),
-           xlim=(-.6, .6))
+           title=r'mode $n$ = {}'.format(i),
+           xlim=(-5, 5))
     ax.label_outer()
 
 print("All plot settings done")
@@ -84,7 +90,6 @@ animation = FuncAnimation(
     fig,
     update,
     frames=range(1, len(nFrames[0]) // 10, 1),
-    # interval=400,
     blit=True
 )
 animation.save(outputName, writer="imagemagick", fps=30, dpi=40)
