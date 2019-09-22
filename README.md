@@ -3,6 +3,8 @@
 
 ![alt text](./data/plots/areas/compressed/schrEq1D_gaussian_wpacketpot_high_area_c.gif "Example of quantum tunneling effect")
 
+NOTE: To see the equations click [here](https://github.com/AniolSala/schrodinger_equation/blob/master/README.ipynb)
+
 ## The leapfrog method
 
 To visualize the Schrödinger equation it has to be solved first. Here we use the leapfrog method,
