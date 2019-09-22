@@ -211,7 +211,7 @@ example, for the harmonic oscillator, ```V_j = -k * x * x``` would be: ```- k * 
 
 # Results
 
-All the results have been obtained with a mass of ```m = 0```, and ```L = 1``` (except for the harmonic oscillator, that a value of ```L = 20``` has been taken),
+All the results have been obtained with a mass of ```m = 1```, and ```L = 1``` (except for the harmonic oscillator, that a value of ```L = 20``` has been taken),
 with the value of ```x``` running between ```- L / 2.0``` and ```L / 2.0```.
 
 ### Free particle
