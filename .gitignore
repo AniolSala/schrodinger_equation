@@ -1,6 +1,6 @@
-/build/
-/CMakeLists.txt
-/__pycache__
-/.ipynb_checkpoints
-/data/*.txt
+./build/
+./CMakeLists.txt
+./__pycache__
+./.ipynb_checkpoints
+./data/*.txt
 

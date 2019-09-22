@@ -3,7 +3,7 @@
 
 ![alt text](./data/plots/areas/compressed/schrEq1D_gaussian_wpacketpot_high_area_c.gif "Example of quantum tunneling effect")
 
-NOTE: To see the equations click [here](https://github.com/AniolSala/schrodinger_equation/blob/master/README.ipynb)
+More plots [here](https://github.com/AniolSala/schrodinger_equation/tree/master/data/plots).
 
 ## The leapfrog method
 
@@ -20,8 +20,8 @@ y '(x) = f(x)
 $$
 
 with $x$ in the range $[x_0, x_f]$, then we can discretize the interval and approximate the
-differential equation with the [finite difference method]
-(https://en.wikipedia.org/wiki/Finite_difference_method) using the leapfrog algorithm:
+differential equation with the [finite difference method](https://en.wikipedia.org/wiki/Finite_difference_method)
+using the leapfrog algorithm:
 
 $$
 \begin{equation}
