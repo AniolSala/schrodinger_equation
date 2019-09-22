@@ -1,3 +1,0 @@
-/home/usuari/Programming/Other_things/C/projects/partial_diff_equations/SchrEquation/1D/build/CMakeFiles/rebuild_cache.dir
-/home/usuari/Programming/Other_things/C/projects/partial_diff_equations/SchrEquation/1D/build/CMakeFiles/main.dir
-/home/usuari/Programming/Other_things/C/projects/partial_diff_equations/SchrEquation/1D/build/CMakeFiles/edit_cache.dir
