@@ -5,6 +5,8 @@
 
 More plots [here](https://github.com/AniolSala/schrodinger_equation/tree/master/data/plots).
 
+To see the equations click [here](https://github.com/AniolSala/schrodinger_equation/tree/master/README.ipynb).
+
 ## The leapfrog method
 
 To visualize the Schrödinger equation it has to be solved first. Here we use the leapfrog method,
