@@ -1,0 +1,12 @@
+[
+{
+  "directory": "/home/usuari/Programming/Other_things/C/projects/partial_diff_equations/SchrEquation/1D/build",
+  "command": "/usr/bin/cc    -Wall -Werror -fdump-rtl-expand -lm   -o CMakeFiles/main.dir/main.c.o   -c /home/usuari/Programming/Other_things/C/projects/partial_diff_equations/SchrEquation/1D/main.c",
+  "file": "/home/usuari/Programming/Other_things/C/projects/partial_diff_equations/SchrEquation/1D/main.c"
+},
+{
+  "directory": "/home/usuari/Programming/Other_things/C/projects/partial_diff_equations/SchrEquation/1D/build",
+  "command": "/usr/bin/cc    -Wall -Werror -fdump-rtl-expand -lm   -o CMakeFiles/main.dir/functions.c.o   -c /home/usuari/Programming/Other_things/C/projects/partial_diff_equations/SchrEquation/1D/functions.c",
+  "file": "/home/usuari/Programming/Other_things/C/projects/partial_diff_equations/SchrEquation/1D/functions.c"
+}
+]

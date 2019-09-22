@@ -1,0 +1,30 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/usuari/Programming/Other_things/C/projects/partial_diff_equations/SchrEquation/1D/./defs.h
+complex.h
+-
+math.h
+-
+stdio.h
+-
+stdlib.h
+-
+
+/home/usuari/Programming/Other_things/C/projects/partial_diff_equations/SchrEquation/1D/main.c
+math.h
+-
+stdio.h
+-
+stdlib.h
+-
+string.h
+-
+./defs.h
+/home/usuari/Programming/Other_things/C/projects/partial_diff_equations/SchrEquation/1D/./defs.h
+
