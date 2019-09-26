@@ -31,7 +31,7 @@ class DataParser:
     def __init__(self, filename, dataDir="data", verbose=False):
         self._errorMsg = ""
         self.verbose = verbose
-        self.dataDirName = dataDir
+        self._dataDirName = dataDir
 
         self.filePath = filename
         self.data = self.getData()
@@ -152,7 +152,7 @@ class DataParser:
 
         When executing the script in a different directory that does not
         contain the requested data, search for the file in a directory
-        called self.dataDirName (by dafaule, self.dataDirName = "data")
+        called self._dataDirName (by dafaule, self._dataDirName = "data")
 
         When no data directory is found, raise warning and return the
         current directory.
@@ -160,14 +160,17 @@ class DataParser:
         """
 
         currentDir = os.getcwd()
-        dirs = [
-            os.path.join(currentDir, ".." * 0, self.dataDirName),
-            os.path.join(currentDir, ".." * 1, self.dataDirName),
-            os.path.join(currentDir, ".." * 2, self.dataDirName),
-            os.path.join(currentDir, ".." * 3, self.dataDirName)
+        # Search for `data` directory in previous directories
+        prevDirs = [
+            os.path.join(currentDir, ".." * 0, self._dataDirName),
+            os.path.join(currentDir, ".." * 1, self._dataDirName),
+            os.path.join(currentDir, ".." * 2, self._dataDirName),
         ]
-
-        for dty in dirs:
+        # Search for `data` directory in subdirectories
+        subDirs = [os.path.join(d, self._dataDirName)
+                   for d in os.listdir(currentDir) if os.path.isdir(d)]
+        # Check if we found some `data` directory
+        for dty in prevDirs + subDirs:
             if os.path.isdir(dty):
                 return os.path.abspath(dty)
 
